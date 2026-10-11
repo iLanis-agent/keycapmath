@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keycap math - calculators</title>
+<style>
+  :root { --accent: #78864f; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #f8f9f4; color: #2b2e24; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #dee3d0; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #76805e; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #c6cfb0; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #9aa287; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Keycap math</h1>
+  <p class="lede">Will that set actually cover your layout, what does each used key really cost, and how many boards can one set dress. Exact counting, every layout assumption labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Coverage plan</h2>
+      <p class="hint">A keycap set against your layout.</p>
+      <label for="c-board">Keys on your board</label>
+      <input id="c-board" type="number" value="68" min="0" step="1">
+      <label for="c-need">Special keys your layout needs</label>
+      <input id="c-need" type="number" value="3" min="0" step="1">
+      <label for="c-set">Keys in the set</label>
+      <input id="c-set" type="number" value="140" min="0" step="1">
+      <label for="c-special">Special keys in the set</label>
+      <input id="c-special" type="number" value="2" min="0" step="1">
+      <button id="c-go">Check the cover</button>
+      <div class="out" id="c-out"></div>
+    </section>
+    <section>
+      <h2>Price plan</h2>
+      <p class="hint">The sting per used key.</p>
+      <label for="p-price">Set price (dollars)</label>
+      <input id="p-price" type="number" value="120" min="0" step="5">
+      <label for="p-set">Keys in the set</label>
+      <input id="p-set" type="number" value="140" min="0" step="1">
+      <label for="p-covered">Keys your board uses</label>
+      <input id="p-covered" type="number" value="68" min="0" step="1">
+      <button id="p-go">Price the keys</button>
+      <div class="out" id="p-out"></div>
+    </section>
+    <section>
+      <h2>Layout plan</h2>
+      <p class="hint">One set, two boards.</p>
+      <label for="l-set">Keys in the set</label>
+      <input id="l-set" type="number" value="150" min="0" step="1">
+      <label for="l-a">First board keys</label>
+      <input id="l-a" type="number" value="68" min="0" step="1">
+      <label for="l-b">Second board keys</label>
+      <input id="l-b" type="number" value="61" min="0" step="1">
+      <button id="l-go">Dress the boards</button>
+      <div class="out" id="l-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/keycapmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('c-go').addEventListener('click', function(){
+  show('c-out', KeycapMath.coveragePlan(num('c-board'),num('c-need'),num('c-set'),num('c-special')), function(r){ return KeycapMath.renderCoverage(r, num('c-board'),num('c-need'),num('c-set'),num('c-special')); });
+});
+document.getElementById('p-go').addEventListener('click', function(){
+  show('p-out', KeycapMath.pricePlan(num('p-price'),num('p-set'),num('p-covered')), function(r){ return KeycapMath.renderPrice(r, num('p-price'),num('p-set'),num('p-covered')); });
+});
+document.getElementById('l-go').addEventListener('click', function(){
+  show('l-out', KeycapMath.layoutPlan(num('l-set'),num('l-a'),num('l-b')), function(r){ return KeycapMath.renderLayout(r, num('l-set'),num('l-a'),num('l-b')); });
+});
+</script>
+</body>
+</html>
